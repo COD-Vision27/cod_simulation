@@ -1,0 +1,90 @@
+world: "rmuc_2026"
+
+robots:
+
+  rmul_2024:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "4.3"
+      y_pose: "3.35"
+      z_pose: "1.2"
+      yaw: "0.0"
+
+    - name: "blue_standard_robot1"
+      color: "blue"
+      x_pose: "10.4"
+      y_pose: "4.35"
+      z_pose: "1.2"
+      yaw: "3.14"
+
+  rmuc_2024:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "6.35"
+      y_pose: "7.6"
+      z_pose: "0.2"
+      yaw: "0.0"
+
+    - name: "blue_standard_robot1"
+      color: "blue"
+      x_pose: "22.8"
+      y_pose: "7.6"
+      z_pose: "0.2"
+      yaw: "3.14"
+
+  rmul_2025:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "-4.8"
+      y_pose: "3.5"
+      z_pose: "0.28"
+      yaw: "0.0"
+
+    - name: "blue_standard_robot1"
+      color: "blue"
+      x_pose: "4.8"
+      y_pose: "-3.5"
+      z_pose: "0.28"
+      yaw: "3.14"
+
+  rmuc_2025:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "3.4"
+      y_pose: "9.5"
+      z_pose: "0.28"
+      yaw: "0.0"
+
+    # 单机测试：暂不 spawn 蓝车（原配置保留在注释里，恢复时取消注释即可）。
+    # 原因：odom_to_tf.py 会把 frame 前缀去掉，两台车同时发 odom->chassis 会冲突。
+    # - name: "blue_standard_robot1"
+    #   color: "blue"
+    #   x_pose: "25.6"
+    #   y_pose: "6.45"
+    #   z_pose: "0.28"
+    #   yaw: "3.14"
+
+  # RMUC 2026：红方出生点在基地旁（(4.5, 7.8) 处地面高度约 0.296 m）。
+  # 出生 z 只要在地面之上即可，模型会自动落到地面（物理负责垂直方向）。
+  rmuc_2026:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "4.5"
+      y_pose: "7.8"
+      z_pose: "0.30"
+      yaw: "0.0"
+
+    # 单机测试：暂不 spawn 蓝车（恢复时取消注释即可）。
+    # - name: "blue_standard_robot1"
+    #   color: "blue"
+    #   x_pose: "24.5"
+    #   y_pose: "4.2"
+    #   z_pose: "0.7"
+    #   yaw: "3.14"
+  rmul_2026:
+    - name: "robot"
+      color: "red"
+      x_pose: "-4.5"
+      y_pose: "2.5"
+      z_pose: "0.1"
+      yaw: "0.0"
