@@ -6,7 +6,7 @@ rmu_gazebo_simulator 是基于 Gazebo (Ignition 字母版本) 的仿真环境，
 
 目前 rmu_gazebo_simulator 提供以下功能：
 
-- rmul_2024, rmuc_2024, rmul_2025, rmuc_2025, rmuc_2026 仿真世界模型
+- rmul_2024, rmuc_2024, rmul_2025, rmuc_2025, rmul_2026, rmuc_2026, rmul_2027, rmuc_2027 仿真世界模型
 
 - 网页端局域网联机对战
 
@@ -93,7 +93,7 @@ ros2 launch rmu_gazebo_simulator bringup_sim.launch.py
 不需要 RViz 时加 `use_rviz:=false`；换配置用 `rviz_config_file:=<绝对路径>`。
 
 > [!NOTE]
-> **注意：需要点击 Gazebo 左下角橙红色的 `启动` 按钮**
+> 仿真启动时会自动进入运行状态，无需再点击 Gazebo 左下角橙红色的 `启动` 按钮。
 
 #### 2.3.1 Test Commands
 
@@ -140,7 +140,7 @@ python3 src/rmu_gazebo_simulator/rmu_gazebo_simulator/scripts/referee_web/main.p
 
 #### 2.3.3 切换仿真世界
 
-修改 [gz_world.yaml](./rmu_gazebo_simulator/config/gz_world.yaml) 中的 `world`。当前可选: `rmul_2024`, `rmuc_2024`, `rmul_2025`, `rmuc_2025`, `rmuc_2026`（默认 `rmuc_2026`）
+修改 [gz_world.yaml](./rmu_gazebo_simulator/config/gz_world.yaml) 中的 `world`。当前可选: `rmul_2024`, `rmuc_2024`, `rmul_2025`, `rmuc_2025`, `rmul_2026`, `rmuc_2026`, `rmul_2027`, `rmuc_2027`（实际生效值以 `gz_world.yaml` 里的 `world` 字段为准）
 
 #### 2.3.4 地图模型转 PCD 点云（离线，不用起仿真）
 
@@ -150,10 +150,10 @@ python3 src/rmu_gazebo_simulator/rmu_gazebo_simulator/scripts/referee_web/main.p
 依赖：`numpy`（必装）；`open3d` 可选（`--sampler poisson` 泊松盘采样，不装则自动用 numpy 面积均匀采样）。
 
 ```bash
-# 1) 当前 gz_world.yaml 选中的世界（默认 rmuc_2026）→ resource/maps/rmuc_2026.pcd
+# 1) 当前 gz_world.yaml 选中的世界 → resource/maps/<world>.pcd
 ros2 run rmu_gazebo_simulator mesh_to_pcd.py --preview
 
-# 2) 指定世界（直接写世界名，可选: rmul_2024 / rmuc_2024 / rmul_2025 / rmuc_2025 / rmul_2026 / rmuc_2026）
+# 2) 指定世界（直接写世界名，可选: rmul_2024 / rmuc_2024 / rmul_2025 / rmuc_2025 / rmul_2026 / rmuc_2026 / rmul_2027 / rmuc_2027）
 ros2 run rmu_gazebo_simulator mesh_to_pcd.py --world rmul_2026
 
 # 3) 只要墙面（裁掉地面）+ 0.02 m 体素 + 原点对齐机器人出生点

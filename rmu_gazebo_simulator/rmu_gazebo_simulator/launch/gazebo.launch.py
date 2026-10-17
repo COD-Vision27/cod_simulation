@@ -34,7 +34,7 @@ def generate_launch_description():
     declare_world_sdf_path = DeclareLaunchArgument(
         "world_sdf_path",
         default_value=os.path.join(
-            pkg_simulator, "resource", "worlds", "rmuc_2026_world.sdf"
+            pkg_simulator, "resource", "worlds", "rmuc_2027_world.sdf"
         ),
         description="Path to the world SDF file",
     )
@@ -54,6 +54,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "gz_args": [
+                TextSubstitution(text="-r "),
                 world_sdf_path,
                 TextSubstitution(text=" --gui-config "),
                 gz_config_path,

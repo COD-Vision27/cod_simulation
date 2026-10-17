@@ -1,4 +1,4 @@
-world: "rmuc_2026"
+world: "rmuc_2027"
 
 robots:
 
@@ -87,4 +87,22 @@ robots:
       x_pose: "-4.5"
       y_pose: "2.5"
       z_pose: "0.1"
+      yaw: "0.0"
+
+  # RMUL 2027：场地模型已居中，地面 z=0，围挡顶面约 0.1 m。
+  rmul_2027:
+    - name: "robot"
+      color: "red"
+      x_pose: "-4.5"
+      y_pose: "2.5"
+      z_pose: "0.15"
+      yaw: "0.0"
+
+  # RMUC 2027：红方出生点暂时沿用 RMUC 2026 的基地附近测试点。
+  rmuc_2027:
+    - name: "red_standard_robot1"
+      color: "red"
+      x_pose: "4.5"
+      y_pose: "7.8"
+      z_pose: "0.30"
       yaw: "0.0"
