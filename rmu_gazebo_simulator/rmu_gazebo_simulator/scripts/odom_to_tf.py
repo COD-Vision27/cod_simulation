@@ -20,8 +20,12 @@ class OdomToTF(Node):
         self.zero_on_start = (
             self.get_parameter('zero_on_start').get_parameter_value().bool_value
         )
+        self.declare_parameter('odom_topic', '/Odometry')
+        odom_topic = (
+            self.get_parameter('odom_topic').get_parameter_value().string_value
+        )
         self.br = TransformBroadcaster(self)
-        self.sub = self.create_subscription(Odometry, 'chassis_odometry_gt', self.cb, 10)
+        self.sub = self.create_subscription(Odometry, odom_topic, self.cb, 10)
         # 出生点位置 (x, y, z)，首帧到达时写入
         self._origin = None
 

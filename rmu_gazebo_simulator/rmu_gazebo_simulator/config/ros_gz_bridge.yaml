@@ -3,12 +3,14 @@
 #       gazebo 侧仍然用 <robot_name>（= gz_world.yaml 里该机器人的 name）。
 # 传感器话题的 frame_id 由 normalize_mid360_frames.py 统一改写。
 
-# mecanum plugin odometry
-- ros_topic_name: "/chassis_odometry_gt"
-  gz_topic_name: "/<robot_name>/odometry"
-  ros_type_name: "nav_msgs/msg/Odometry"
-  gz_type_name: "gz.msgs.Odometry"
-  direction: "GZ_TO_ROS"
+# 不使用仿真内部里程计，导航程序直接发布 /Odometry。
+# 如需临时使用 Gazebo 真值里程计，恢复该桥接，并同步恢复
+# simple_chassis_robot.sdf.xmacro 中的 OdometryPublisher。
+# - ros_topic_name: "/chassis_odometry_gt"
+#   gz_topic_name: "/<robot_name>/odometry"
+#   ros_type_name: "nav_msgs/msg/Odometry"
+#   gz_type_name: "gz.msgs.Odometry"
+#   direction: "GZ_TO_ROS"
 
 # JointStatePublisher publish
 - ros_topic_name: "/joint_states"

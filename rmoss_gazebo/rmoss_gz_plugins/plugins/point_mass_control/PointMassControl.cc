@@ -46,6 +46,7 @@ public:
     Model model{kNullEntity};
     std::string linkName;
     Entity link{kNullEntity};
+    bool lockRollPitch{false};
 
     std::mutex targetVelMutex;
     msgs::Twist targetVel;
@@ -76,6 +77,8 @@ void PointMassControl::Configure(const Entity &_entity,
         return;
     }
 
+    this->dataPtr->lockRollPitch =
+        _sdf->Get<bool>("lock_roll_pitch", false).first;
     std::string defaultTopic{"/model/" + this->dataPtr->model.Name(_ecm) + "/cmd_vel"};
     std::string topic = _sdf->Get<std::string>("topic", defaultTopic).first;
     this->dataPtr->node.Subscribe(topic, &PointMassControlPrivate::OnCmdVel, this->dataPtr.get());
@@ -122,6 +125,10 @@ void PointMassControl::PreUpdate(const gz::sim::UpdateInfo &_info,
     math::Vector3d newLinVel(target.linear().x(), target.linear().y(), curLinVel.Z());
     // 偏航角速度用指令；roll/pitch 保留物理值（过坡道时自然俯仰）
     math::Vector3d newAngVel(curAngVel.X(), curAngVel.Y(), target.angular().z());
+    if (this->dataPtr->lockRollPitch)
+    {
+        newAngVel = math::Vector3d(0, 0, target.angular().z());
+    }
 
     link.SetLinearVelocity(_ecm, newLinVel);
     link.SetAngularVelocity(_ecm, newAngVel);

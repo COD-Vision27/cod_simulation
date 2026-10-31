@@ -13,11 +13,18 @@
 # limitations under the License.
 
 import os
+import tempfile
 
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    OpaqueFunction,
+    RegisterEventHandler,
+)
+from launch.event_handlers import OnShutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from nav2_common.launch import ReplaceString
@@ -29,8 +36,8 @@ def launch_setup(context, *args, **kwargs):
     remappings = [("/tf", "tf"), ("/tf_static", "tf_static")]
 
     pkg_simulator = get_package_share_directory("rmu_gazebo_simulator")
-    pkg_pb2025_robot_description = get_package_share_directory(
-        "pb2025_robot_description"
+    pkg_cod2027_sentry = get_package_share_directory(
+        "cod2027_sentry"
     )
 
     robot_xmacro_path = LaunchConfiguration("robot_xmacro").perform(context)
@@ -53,6 +60,19 @@ def launch_setup(context, *args, **kwargs):
         # 模型里的 @ROBOT_NAME@（速度控制插件的 gz 话题名）替换成实际机器人名
         robot_xml = xmacro.to_string().replace("@ROBOT_NAME@", robot["name"])
 
+        # cod27_sentry has many detailed visual meshes, so the expanded SDF is
+        # larger than the platform's command-line argument limit. Pass it to
+        # ros_gz_sim through a temporary file instead of -string.
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            prefix=f"cod_sim_{robot['name']}_",
+            suffix=".sdf",
+            encoding="utf-8",
+            delete=False,
+        ) as robot_sdf_file:
+            robot_sdf_file.write(robot_xml)
+            robot_sdf_path = robot_sdf_file.name
+
         urdf_generator = UrdfGenerator()
         urdf_generator.parse_from_sdf_string(robot_xml)
         robot_urdf_xml = urdf_generator.to_string()
@@ -66,8 +86,8 @@ def launch_setup(context, *args, **kwargs):
             package="ros_gz_sim",
             executable="create",
             arguments=[
-                "-string",
-                robot_xml,
+                "-file",
+                robot_sdf_path,
                 "-name",
                 robot["name"],
                 "-allow_renaming",
@@ -82,9 +102,17 @@ def launch_setup(context, *args, **kwargs):
                 robot["yaw"],
             ],
         )
+        remove_robot_sdf = RegisterEventHandler(
+            OnShutdown(
+                on_shutdown=lambda _event, _context, path=robot_sdf_path: (
+                    os.unlink(path) if os.path.exists(path) else None
+                ),
+            )
+        )
 
         # 说明：以下节点都不加命名空间（单机器人调试用），
-        # 话题是 /cmd_vel、/chassis_odometry_gt、/livox/...、/rplidar_a2/... 这样不带机器人名前缀的形式。
+        # 话题是 /cmd_vel、/livox/...、/rplidar_a2/... 这样不带机器人名前缀的形式；
+        # 里程计由导航程序发布到 /Odometry，odom_to_tf 订阅后发布 odom->baselink。
         # 机器人名只保留在参数里，用于拼接 gazebo 侧的话题。
         robot_base = Node(
             package="rmoss_gz_base",
@@ -134,7 +162,11 @@ def launch_setup(context, *args, **kwargs):
             package="rmu_gazebo_simulator",
             executable="odom_to_tf.py",
             parameters=[
-                {"use_sim_time": True, "child_frame_id": "baselink"}
+                {
+                    "use_sim_time": True,
+                    "child_frame_id": "baselink",
+                    "odom_topic": "/Odometry",
+                }
             ],
             remappings=[],
         )
@@ -158,6 +190,7 @@ def launch_setup(context, *args, **kwargs):
         )
 
         ld.append(spawn_robot)
+        ld.append(remove_robot_sdf)
         ld.append(robot_base)
         ld.append(robot_state_publisher)
         ld.append(robot_ign_bridge)
@@ -169,22 +202,20 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    pkg_pb2025_robot_description = get_package_share_directory(
-        "pb2025_robot_description"
+    pkg_cod2027_sentry = get_package_share_directory(
+        "cod2027_sentry"
     )
 
     declare_robot_xmacro_cmd = DeclareLaunchArgument(
         "robot_xmacro",
         default_value=os.path.join(
-            pkg_pb2025_robot_description,
+            pkg_cod2027_sentry,
             "resource",
             "xmacro",
-            "simple_chassis_robot.sdf.xmacro",
+            "cod27_sentry.sdf.xmacro",
         ),
         description=(
-            "Path to the robot SDF xmacro file. Default: simple_chassis_robot "
-            "(580x580mm square chassis, mid360 at 210mm). Use "
-            "simulation_robot.sdf.xmacro for the full RM robot."
+            "Path to the robot SDF xmacro file. Default: cod27_sentry."
         ),
     )
 
