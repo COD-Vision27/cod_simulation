@@ -2,7 +2,8 @@
   ros__parameters:
     world_name: "default"
     chassis_controller:
-      follow_yaw: true
+      # 启动时保持出生朝向；仅在收到 FOLLOW_GIMBAL 指令后进入跟随模式。
+      follow_yaw: false
       follow_yaw_pid:
         p: 5.0
         i: 0.0
